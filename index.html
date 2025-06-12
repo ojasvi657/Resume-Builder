@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Resume Builder</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+  /* Reset and base */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #fff; /* white only */
+    color: #000; /* black text only */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  h1, h2, h3, h4 {
+    color: #000; /* black only */
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+  h1 {
+    font-size: 2.5rem;
+  }
+  h2 {
+    font-size: 1.8rem;
+  }
+  h3 {
+    font-size: 1.3rem;
+  }
+  label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: #000; /* black label text */
+  }
+  input, textarea, select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 1px solid #000; /* black border */
+    border-radius: 0.5rem;
+    background: #fff; /* white background */
+    color: #000;
+    transition: border-color 0.3s ease;
+    resize: vertical;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: #000;
+    outline: none;
+    background: #fff;
+  }
+  textarea {
+    min-height: 80px;
+  }
+  button {
+    background: #000;
+    color: white;
+    font-weight: 700;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover,
+  button:focus {
+    background: #333;
+    outline: none;
+  }
+  main {
+    flex-grow: 1;
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    gap: 1.5rem;
+    padding: 2rem 1rem 4rem;
+  }
+  /* Sidebar navigation for sections on larger screens */
+  nav.sections-nav {
+    flex-shrink: 0;
+    width: 220px;
+    border-radius: 0.75rem;
+    background: #fff; /* white only */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 1rem;
+    position: sticky;
+    top: 1rem;
+    height: fit-content;
+  }
+  nav.sections-nav h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  nav.sections-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  nav.sections-nav li {
+    margin-bottom: 0.75rem;
+  }
+  nav.sections-nav button {
+    width: 100%;
+    background: transparent;
+    color: #000;
+    font-weight: 600;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  nav.sections-nav button:hover,
+  nav.sections-nav button.active {
+    background-color: #000;
+    color: white;
+  }
+  /* Form sections */
+  section.form-section {
+    flex-grow: 1;
+    background: #fff;
+    border-radius: 0.75rem;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  section.form-section:not(:last-child) {
+    margin-bottom: 2rem;
+  }
+  /* Preview */
+  aside#preview {
+    flex-shrink: 0;
+    flex-basis: 45%;
+    background: #fff;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow-y: auto;
+    max-height: 80vh;
+    color: #000;
+  }
+  /* Undo default list styles in preview */
+  #preview ul {
+    padding-left: 1.2rem;
+  }
+  #preview ul li {
+    margin-bottom: 0.4rem;
+  }
+  /* Responsive layout adjustments */
+  @media (max-width: 1024px) {
+    main {
+      flex-direction: column;
+      padding: 2rem 1rem 3rem;
+    }
+    nav.sections-nav {
+      width: 100%;
+      display: flex;
+      overflow-x: auto;
+      position: relative;
+      top: auto;
+      height: auto;
+      box-shadow: none;
+      background: transparent;
+      margin-bottom: 1rem;
+      padding: 0;
+    }
+    nav.sections-nav ul {
+      display: flex;
+      gap: 0.5rem;
+    }
+    nav.sections-nav li {
+      margin-bottom: 0;
+    }
+    nav.sections-nav button {
+      border-radius: 0.375rem;
+      padding: 0.75rem 1rem;
+      white-space: nowrap;
+      font-size: 0.95rem;
+    }
+    section.form-section {
+      max-height: none;
+      padding: 1rem;
+    }
+    aside#preview {
+      flex-basis: auto;
+      max-height: none;
+      margin-top: 2rem;
+      padding: 1.5rem;
+    }
+  }
+
+  /* Resume preview styling */
+
+  #preview h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #000;
+    margin-bottom: 0.25rem;
+  }
+  #preview h3 {
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 0.5rem;
+  }
+  #preview h4 {
+    font-weight: 600;
+    color: #000;
+    margin: 0.25rem 0 0.5rem;
+  }
+  #preview p, #preview li {
+    font-size: 1rem;
+    color: #000;
+    margin: 0.25rem 0;
+    line-height: 1.4;
+  }
+  #preview a {
+    color: #000;
+    text-decoration: underline;
+  }
+  #preview a:hover,
+  #preview a:focus {
+    text-decoration: none;
+  }
+  #preview hr {
+    border: none;
+    border-top: 1px solid #000;
+    margin: 1rem 0 1.5rem;
+  }
+  #preview .section {
+    margin-bottom: 1.5rem;
+  }
+  #preview .section-title {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #000;
+    border-bottom: 2px solid #000;
+    padding-bottom: 0.25rem;
+    margin-bottom: 1rem;
+  }
+  #preview .entry-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.15rem;
+  }
+  /* Accessibility focus styles */
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 3px solid #000;
+    outline-offset: 2px;
+  }
+  /* Scrollbar for form sections */
+  section.form-section::-webkit-scrollbar {
+    width: 10px;
+  }
+  section.form-section::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 5px;
+  }
+
+  /* Material icons */
+  .material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+    vertical-align: middle;
+    user-select: none;
+    margin-right: 0.3rem;
+    color: #000;
+  }
+
+  /* Header styles and layout */
+  header {
+    background:#fff;
+    box-shadow:0 2px 8px rgba(0,0,0,0.05);
+    position:sticky;
+    top:0;
+    z-index:100;
+    padding:1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  header h1 {
+    margin: 0;
+  }
+  /* Download button in header */
+  #download-pdf-btn {
+    background: #000;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+  #download-pdf-btn:hover,
+  #download-pdf-btn:focus {
+    background: #333;
+    outline: none;
+  }
+</style>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+</head>
+<body>
+<header>
+  <h1>Resume Builder</h1>
+  <button id="download-pdf-btn" aria-label="Download Resume as PDF">Download PDF</button>
+</header>
+<main>
+  <nav class="sections-nav" aria-label="Resume builder sections">
+    <h2 class="sr-only">Sections Navigation</h2>
+    <ul>
+      <li><button type="button" class="active" data-target="personal-info" aria-current="true">Personal Info</button></li>
+      <li><button type="button" data-target="education">Education</button></li>
+      <li><button type="button" data-target="experience">Experience</button></li>
+      <li><button type="button" data-target="projects">Projects</button></li>
+      <li><button type="button" data-target="publications">Publications</button></li>
+      <li><button type="button" data-target="technologies">Technologies</button></li>
+    </ul>
+  </nav>
+
+  <section id="form-container">
+    <section id="personal-info" class="form-section" role="region" aria-labelledby="personal-info-title">
+      <h2 id="personal-info-title">Personal Information</h2>
+      <label for="fullName"><span class="material-icons" aria-hidden="true">person</span>Full Name</label>
+      <input id="fullName" type="text" placeholder="Ojasvi Agrawal" />
+      <label for="location"><span class="material-icons" aria-hidden="true">place</span>Location</label>
+      <input id="location" type="text" placeholder="Lucknow" />
+      <label for="email"><span class="material-icons" aria-hidden="true">email</span>Email</label>
+      <input id="email" type="email" placeholder="ojasvi.613@gmail.com" />
+      <label for="phone"><span class="material-icons" aria-hidden="true">phone</span>Phone Number</label>
+      <input id="phone" type="tel" placeholder="9838902250" />
+      <label for="website"><span class="material-icons" aria-hidden="true">language</span>Website</label>
+      <input id="website" type="url" placeholder="https://mywebsite.com" />
+      <label for="linkedin"><span class="material-icons" aria-hidden="true">link</span>LinkedIn</label>
+      <input id="linkedin" type="url" placeholder="https://linkedin.com/in/ojasvi" />
+      <label for="github"><span class="material-icons" aria-hidden="true">code</span>GitHub</label>
+      <input id="github" type="url" placeholder="https://github.com/ojasvi" />
+    </section>
+
+    <section id="education" class="form-section" role="region" aria-labelledby="education-title" hidden>
+      <h2 id="education-title">Education</h2>
+      <p>Use the "Add Education" button to add multiple entries.</p>
+      <div id="education-list" aria-live="polite"></div>
+      <button type="button" id="add-education">Add Education</button>
+    </section>
+
+    <section id="experience" class="form-section" role="region" aria-labelledby="experience-title" hidden>
+      <h2 id="experience-title">Experience</h2>
+      <p>Use the "Add Experience" button to add multiple entries.</p>
+      <div id="experience-list" aria-live="polite"></div>
+      <button type="button" id="add-experience">Add Experience</button>
+    </section>
+
+    <section id="projects" class="form-section" role="region" aria-labelledby="projects-title" hidden>
+      <h2 id="projects-title">Projects</h2>
+      <p>Use the "Add Project" button to add multiple entries.</p>
+      <div id="projects-list" aria-live="polite"></div>
+      <button type="button" id="add-project">Add Project</button>
+    </section>
+
+    <section id="publications" class="form-section" role="region" aria-labelledby="publications-title" hidden>
+      <h2 id="publications-title">Publications</h2>
+      <p>Use the "Add Publication" button to add multiple entries.</p>
+      <div id="publications-list" aria-live="polite"></div>
+      <button type="button" id="add-publication">Add Publication</button>
+    </section>
+
+    <section id="technologies" class="form-section" role="region" aria-labelledby="technologies-title" hidden>
+      <h2 id="technologies-title">Technologies & Skills</h2>
+      <label for="tech-list"><span class="material-icons" aria-hidden="true">build</span>Enter your skills or technologies, separated by commas</label>
+      <textarea id="tech-list" placeholder="C++, Java, C#, SQL, JavaScript"></textarea>
+    </section>
+  </section>
+
+  <aside id="preview" role="region" aria-live="polite" aria-label="Resume preview">
+    <h1 id="preview-name">Ojasvi Agrawal</h1>
+    <p id="preview-contact">Lucknow | ojasvi.613@gmail.com | 9838902250</p>
+    <p id="preview-links">
+      <a href="#" target="_blank" rel="noopener" id="preview-website">Website</a> | 
+      <a href="#" target="_blank" rel="noopener" id="preview-linkedin">LinkedIn</a> | 
+      <a href="#" target="_blank" rel="noopener" id="preview-github">GitHub</a>
+    </p>
+    <hr />
+    <section id="preview-education" class="section">
+      <h2 class="section-title">Education</h2>
+    </section>
+    <section id="preview-experience" class="section">
+      <h2 class="section-title">Experience</h2>
+    </section>
+    <section id="preview-projects" class="section">
+      <h2 class="section-title">Projects</h2>
+    </section>
+    <section id="preview-publications" class="section">
+      <h2 class="section-title">Publications</h2>
+    </section>
+    <section id="preview-technologies" class="section">
+      <h2 class="section-title">Technologies & Skills</h2>
+      <p id="preview-tech-list"></p>
+    </section>
+  </aside>
+</main>
+<!-- CDNs for jsPDF and html2canvas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const { jsPDF } = window.jspdf;
+    // Navigation tab switching
+    const navButtons = document.querySelectorAll('nav.sections-nav button');
+    const sections = document.querySelectorAll('#form-container section.form-section');
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-target');
+        navButtons.forEach(b => b.classList.remove('active'));
+        navButtons.forEach(b => b.removeAttribute('aria-current'));
+        btn.classList.add('active');
+        btn.setAttribute('aria-current', 'true');
+        sections.forEach(sec => {
+          sec.hidden = sec.id !== target;
+        });
+        const firstInput = document.querySelector(`#${target} input, #${target} textarea`);
+        if(firstInput) firstInput.focus();
+      });
+    });
+    // Utility for creating elements
+    function ce(tag, attrs = {}, children = []) {
+      const el = document.createElement(tag);
+      for (const [k,v] of Object.entries(attrs)) {
+        if(k === 'class') el.className = v;
+        else if(k === 'html') el.innerHTML = v;
+        else if(k === 'text') el.textContent = v;
+        else el.setAttribute(k,v);
+      }
+      children.forEach(c => el.appendChild(c));
+      return el;
+    }
+    // Education
+    const educationList = document.getElementById('education-list');
+    const addEducationBtn = document.getElementById('add-education');
+    let educationEntries = [];
+    function renderEducation() {
+      educationList.innerHTML = '';
+      educationEntries.forEach((edu, idx) => {
+        const container = ce('div',{class:'entry-card', tabindex:"0", style:"background:#fff;padding:1rem;border-radius:0.5rem;box-shadow:0 1px 4px rgba(0,0,0,0.1);margin-bottom:1rem;outline:none;"});
+        const schoolInput = ce('input', {type:'text', placeholder:'University of Pennsylvania', value:edu.school});
+        schoolInput.addEventListener('input', e => { educationEntries[idx].school=e.target.value; updatePreview(); });
+        const degreeInput = ce('input', {type:'text', placeholder:'BS in Computer Science', value:edu.degree});
+        degreeInput.addEventListener('input', e => { educationEntries[idx].degree=e.target.value; updatePreview(); });
+        const dateInput = ce('input', {type:'text', placeholder:'Sept 2000 – May 2005', value:edu.date});
+        dateInput.addEventListener('input', e => { educationEntries[idx].date=e.target.value; updatePreview(); });
+        const gpaInput = ce('input', {type:'text', placeholder:'GPA: 3.9/4.0', value:edu.gpa});
+        gpaInput.addEventListener('input', e => { educationEntries[idx].gpa=e.target.value; updatePreview(); });
+        const courseworkInput = ce('textarea', {placeholder:'Coursework: Computer Architecture, Algorithms, Theory', rows:2, spellcheck:"false", style:"resize:none;"});
+        courseworkInput.value = edu.coursework;
+        courseworkInput.addEventListener('input', e => { educationEntries[idx].coursework=e.target.value; updatePreview(); });
+        const removeBtn = ce('button', {type:'button', style:"margin-top:0.5rem;background:#ef4444;color:#fff;border:none;padding:0.4rem 1rem;border-radius:0.5rem;cursor:pointer;"});
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', () => {
+          educationEntries.splice(idx,1);
+          renderEducation();
+          updatePreview();
+        });
+        container.appendChild(ce('label',{text:'School / Institution'}));
+        container.appendChild(schoolInput);
+        container.appendChild(ce('label',{text:'Degree / Certificate'}));
+        container.appendChild(degreeInput);
+        container.appendChild(ce('label',{text:'Dates Attended'}));
+        container.appendChild(dateInput);
+        container.appendChild(ce('label',{text:'GPA / Score'}));
+        container.appendChild(gpaInput);
+        container.appendChild(ce('label',{text:'Coursework (optional)'}));
+        container.appendChild(courseworkInput);
+        container.appendChild(removeBtn);
+        educationList.appendChild(container);
+      });
+    }
+    addEducationBtn.addEventListener('click', () => {
+      educationEntries.push({school:'', degree:'', date:'', gpa:'', coursework:''});
+      renderEducation();
+    });
+    // Experience
+    const experienceList = document.getElementById('experience-list');
+    const addExperienceBtn = document.getElementById('add-experience');
+    let experienceEntries = [];
+    function renderExperience() {
+      experienceList.innerHTML = '';
+      experienceEntries.forEach((exp, idx) => {
+        const container = ce('div',{class:'entry-card', tabindex:"0", style:"background:#fff;padding:1rem;border-radius:0.5rem;box-shadow:0 1px 4px rgba(0,0,0,0.1);margin-bottom:1rem;outline:none;"});
+        const positionInput = ce('input', {type:'text', placeholder:'Software Engineer', value:exp.position});
+        positionInput.addEventListener('input', e => { experienceEntries[idx].position=e.target.value; updatePreview(); });
+        const companyInput = ce('input', {type:'text', placeholder:'Apple Cupertino, CA', value:exp.company});
+        companyInput.addEventListener('input', e => { experienceEntries[idx].company=e.target.value; updatePreview(); });
+        const datesInput = ce('input', {type:'text', placeholder:'June 2005 – Aug 2007', value:exp.dates});
+        datesInput.addEventListener('input', e => { experienceEntries[idx].dates=e.target.value; updatePreview(); });
+        const descInput = ce('textarea', {placeholder:'Describe your responsibilities and achievements', rows:3, spellcheck:"false", style:"resize:none;"});
+        descInput.value = exp.description;
+        descInput.addEventListener('input', e => { experienceEntries[idx].description=e.target.value; updatePreview(); });
+        const removeBtn = ce('button', {type:'button', style:"margin-top:0.5rem;background:#ef4444;color:#fff;border:none;padding:0.4rem 1rem;border-radius:0.5rem;cursor:pointer;"});
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', () => {
+          experienceEntries.splice(idx,1);
+          renderExperience();
+          updatePreview();
+        });
+        container.appendChild(ce('label',{text:'Position/Title'}));
+        container.appendChild(positionInput);
+        container.appendChild(ce('label',{text:'Company/Location'}));
+        container.appendChild(companyInput);
+        container.appendChild(ce('label',{text:'Dates Employed'}));
+        container.appendChild(datesInput);
+        container.appendChild(ce('label',{text:'Description'}));
+        container.appendChild(descInput);
+        container.appendChild(removeBtn);
+        experienceList.appendChild(container);
+      });
+    }
+    addExperienceBtn.addEventListener('click', () => {
+      experienceEntries.push({position:'', company:'', dates:'', description:''});
+      renderExperience();
+    });
+    // Projects
+    const projectsList = document.getElementById('projects-list');
+    const addProjectBtn = document.getElementById('add-project');
+    let projectEntries = [];
+    function renderProjects() {
+      projectsList.innerHTML = '';
+      projectEntries.forEach((proj, idx) => {
+        const container = ce('div',{class:'entry-card', tabindex:"0", style:"background:#fff;padding:1rem;border-radius:0.5rem;box-shadow:0 1px 4px rgba(0,0,0,0.1);margin-bottom:1rem;outline:none;"});
+        const titleInput = ce('input', {type:'text', placeholder:'Multi-User Drawing Tool', value:proj.title});
+        titleInput.addEventListener('input', e => { projectEntries[idx].title=e.target.value; updatePreview(); });
+        const linkInput = ce('input', {type:'url', placeholder:'https://github.com/name/repo', value:proj.link});
+        linkInput.addEventListener('input', e => { projectEntries[idx].link=e.target.value; updatePreview(); });
+        const descInput = ce('textarea', {placeholder:'Project description', rows:3, spellcheck:"false", style:"resize:none;"});
+        descInput.value = proj.description;
+        descInput.addEventListener('input', e => { projectEntries[idx].description=e.target.value; updatePreview(); });
+        const removeBtn = ce('button', {type:'button', style:"margin-top:0.5rem;background:#ef4444;color:#fff;border:none;padding:0.4rem 1rem;border-radius:0.5rem;cursor:pointer;"});
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', () => {
+          projectEntries.splice(idx,1);
+          renderProjects();
+          updatePreview();
+        });
+        container.appendChild(ce('label',{text:'Project Title'}));
+        container.appendChild(titleInput);
+        container.appendChild(ce('label',{text:'Project Link'}));
+        container.appendChild(linkInput);
+        container.appendChild(ce('label',{text:'Description'}));
+        container.appendChild(descInput);
+        container.appendChild(removeBtn);
+        projectsList.appendChild(container);
+      });
+    }
+    addProjectBtn.addEventListener('click', () => {
+      projectEntries.push({title:'', link:'', description:''});
+      renderProjects();
+    });
+    // Publications
+    const publicationsList = document.getElementById('publications-list');
+    const addPublicationBtn = document.getElementById('add-publication');
+    let publicationEntries = [];
+    function renderPublications() {
+      publicationsList.innerHTML = '';
+      publicationEntries.forEach((pub, idx) => {
+        const container = ce('div',{class:'entry-card', tabindex:"0", style:"background:#fff;padding:1rem;border-radius:0.5rem;box-shadow:0 1px 4px rgba(0,0,0,0.1);margin-bottom:1rem;outline:none;"});
+        const titleInput = ce('input', {type:'text', placeholder:'3D Finite Element Analysis of No-Insulation Coils', value:pub.title});
+        titleInput.addEventListener('input', e => { publicationEntries[idx].title=e.target.value; updatePreview(); });
+        const authorsInput = ce('input', {type:'text', placeholder:'Frodo Baggins, Ojasvi Agrawal, Samwise Gamgee', value:pub.authors});
+        authorsInput.addEventListener('input', e => { publicationEntries[idx].authors=e.target.value; updatePreview(); });
+        const dateInput = ce('input', {type:'text', placeholder:'Jan 2004', value:pub.date});
+        dateInput.addEventListener('input', e => { publicationEntries[idx].date=e.target.value; updatePreview(); });
+        const linkInput = ce('input', {type:'url', placeholder:'https://doi.org/10.1109/TASC.2023.3340648', value:pub.link});
+        linkInput.addEventListener('input', e => { publicationEntries[idx].link=e.target.value; updatePreview(); });
+        const removeBtn = ce('button', {type:'button', style:"margin-top:0.5rem;background:#ef4444;color:#fff;border:none;padding:0.4rem 1rem;border-radius:0.5rem;cursor:pointer;"});
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', () => {
+          publicationEntries.splice(idx,1);
+          renderPublications();
+          updatePreview();
+        });
+        container.appendChild(ce('label',{text:'Publication Title'}));
+        container.appendChild(titleInput);
+        container.appendChild(ce('label',{text:'Authors'}));
+        container.appendChild(authorsInput);
+        container.appendChild(ce('label',{text:'Date'}));
+        container.appendChild(dateInput);
+        container.appendChild(ce('label',{text:'Link'}));
+        container.appendChild(linkInput);
+        container.appendChild(removeBtn);
+        publicationsList.appendChild(container);
+      });
+    }
+    addPublicationBtn.addEventListener('click', () => {
+      publicationEntries.push({title:'', authors:'', date:'', link:''});
+      renderPublications();
+    });
+    // Technologies
+    const techTextarea = document.getElementById('tech-list');
+    function updatePreview() {
+      const fullName = document.getElementById('fullName').value.trim();
+      const location = document.getElementById('location').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const website = document.getElementById('website').value.trim();
+      const linkedin = document.getElementById('linkedin').value.trim();
+      const github = document.getElementById('github').value.trim();
+
+      const previewName = document.getElementById('preview-name');
+      previewName.textContent = fullName || 'Your Name';
+
+      const previewContact = document.getElementById('preview-contact');
+      let contactParts = [];
+      if(location) contactParts.push(location);
+      if(email) contactParts.push(email);
+      if(phone) contactParts.push(phone);
+      previewContact.textContent = contactParts.join(' | ');
+
+      const previewWebsite = document.getElementById('preview-website');
+      if (website) {
+        previewWebsite.href = website;
+        previewWebsite.textContent = website.replace(/^https?:\/\//, '');
+        previewWebsite.style.display = 'inline';
+      } else {
+        previewWebsite.href = '#';
+        previewWebsite.textContent = 'Website';
+        previewWebsite.style.display = 'none';
+      }
+
+      const previewLinkedIn = document.getElementById('preview-linkedin');
+      if (linkedin) {
+        previewLinkedIn.href = linkedin;
+        previewLinkedIn.textContent = 'LinkedIn';
+        previewLinkedIn.style.display = 'inline';
+      } else {
+        previewLinkedIn.href = '#';
+        previewLinkedIn.textContent = 'LinkedIn';
+        previewLinkedIn.style.display = 'none';
+      }
+
+      const previewGitHub = document.getElementById('preview-github');
+      if (github) {
+        previewGitHub.href = github;
+        previewGitHub.textContent = 'GitHub';
+        previewGitHub.style.display = 'inline';
+      } else {
+        previewGitHub.href = '#';
+        previewGitHub.textContent = 'GitHub';
+        previewGitHub.style.display = 'none';
+      }
+
+      const eduContainer = document.getElementById('preview-education');
+      eduContainer.innerHTML = '<h2 class="section-title">Education</h2>';
+      if(educationEntries.length === 0) {
+        const p = document.createElement('p');
+        p.textContent = 'No education info provided.';
+        eduContainer.appendChild(p);
+      } else {
+        educationEntries.forEach(edu => {
+          const entryDiv = document.createElement('div');
+          const title = document.createElement('h3');
+          title.className = 'entry-title';
+          title.textContent = edu.school || 'School name';
+          entryDiv.appendChild(title);
+
+          if(edu.degree) {
+            const degreeP = document.createElement('p');
+            degreeP.textContent = edu.degree;
+            entryDiv.appendChild(degreeP);
+          }
+          if(edu.date) {
+            const dateP = document.createElement('p');
+            dateP.textContent = edu.date;
+            entryDiv.appendChild(dateP);
+          }
+          if(edu.gpa) {
+            const gpaP = document.createElement('p');
+            gpaP.textContent = edu.gpa;
+            entryDiv.appendChild(gpaP);
+          }
+          if(edu.coursework) {
+            const cwP = document.createElement('p');
+            cwP.textContent = 'Coursework: ' + edu.coursework;
+            entryDiv.appendChild(cwP);
+          }
+          eduContainer.appendChild(entryDiv);
+        });
+      }
+
+      const expContainer = document.getElementById('preview-experience');
+      expContainer.innerHTML = '<h2 class="section-title">Experience</h2>';
+      if(experienceEntries.length === 0) {
+        const p = document.createElement('p');
+        p.textContent = 'No experience info provided.';
+        expContainer.appendChild(p);
+      } else {
+        experienceEntries.forEach(exp => {
+          const entryDiv = document.createElement('div');
+          const title = document.createElement('h3');
+          title.className = 'entry-title';
+          title.textContent = exp.position || 'Position';
+          entryDiv.appendChild(title);
+
+          if(exp.company) {
+            const companyP = document.createElement('p');
+            companyP.textContent = exp.company;
+            entryDiv.appendChild(companyP);
+          }
+          if(exp.dates) {
+            const datesP = document.createElement('p');
+            datesP.textContent = exp.dates;
+            entryDiv.appendChild(datesP);
+          }
+          if(exp.description) {
+            const descP = document.createElement('p');
+            descP.textContent = exp.description;
+            entryDiv.appendChild(descP);
+          }
+          expContainer.appendChild(entryDiv);
+        });
+      }
+
+      const projContainer = document.getElementById('preview-projects');
+      projContainer.innerHTML = '<h2 class="section-title">Projects</h2>';
+      if(projectEntries.length === 0) {
+        const p = document.createElement('p');
+        p.textContent = 'No projects info provided.';
+        projContainer.appendChild(p);
+      } else {
+        projectEntries.forEach(proj => {
+          const entryDiv = document.createElement('div');
+          const title = document.createElement('h3');
+          title.className = 'entry-title';
+          title.textContent = proj.title || 'Project Title';
+          entryDiv.appendChild(title);
+
+          if(proj.link) {
+            const linkA = document.createElement('a');
+            linkA.href = proj.link;
+            linkA.textContent = 'Project link';
+            linkA.target = "_blank";
+            linkA.rel = "noopener";
+            entryDiv.appendChild(linkA);
+          }
+          if(proj.description) {
+            const descP = document.createElement('p');
+            descP.textContent = proj.description;
+            entryDiv.appendChild(descP);
+          }
+          projContainer.appendChild(entryDiv);
+        });
+      }
+
+      const pubContainer = document.getElementById('preview-publications');
+      pubContainer.innerHTML = '<h2 class="section-title">Publications</h2>';
+      if(publicationEntries.length === 0) {
+        const p = document.createElement('p');
+        p.textContent = 'No publications info provided.';
+        pubContainer.appendChild(p);
+      } else {
+        publicationEntries.forEach(pub => {
+          const entryDiv = document.createElement('div');
+          const title = document.createElement('h3');
+          title.className = 'entry-title';
+          title.textContent = pub.title || 'Publication Title';
+          entryDiv.appendChild(title);
+
+          if(pub.authors) {
+            const authorsP = document.createElement('p');
+            authorsP.textContent = pub.authors;
+            entryDiv.appendChild(authorsP);
+          }
+          if(pub.date) {
+            const dateP = document.createElement('p');
+            dateP.textContent = pub.date;
+            entryDiv.appendChild(dateP);
+          }
+          if(pub.link) {
+            const linkA = document.createElement('a');
+            linkA.href = pub.link;
+            linkA.textContent = 'Publication link';
+            linkA.target = "_blank";
+            linkA.rel = "noopener";
+            entryDiv.appendChild(linkA);
+          }
+          pubContainer.appendChild(entryDiv);
+        });
+      }
+
+      const techContainer = document.getElementById('preview-tech-list');
+      const techListRaw = techTextarea.value.trim();
+      if(techListRaw.length === 0) {
+        techContainer.textContent = 'No technologies or skills provided.';
+      } else {
+        const techs = techListRaw.split(',').map(t => t.trim()).filter(t => t.length > 0);
+        techContainer.innerHTML = '';
+        techs.forEach(tech => {
+          const span = document.createElement('span');
+          span.textContent = tech;
+          span.style.marginRight = '0.5rem';
+          span.style.padding = '0.3rem 0.6rem';
+          span.style.backgroundColor = '#000';
+          span.style.color = '#fff';
+          span.style.fontWeight = '600';
+          span.style.borderRadius = '0.5rem';
+          techContainer.appendChild(span);
+        });
+      }
+    }
+    // Attach input events
+    ['fullName','location','email','phone','website','linkedin','github'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.addEventListener('input', updatePreview);
+    });
+    if(techTextarea) techTextarea.addEventListener('input', updatePreview);
+    // Initial render
+    renderEducation();
+    renderExperience();
+    renderProjects();
+    renderPublications();
+    updatePreview();
+    // PDF download button logic with improvements
+    document.getElementById('download-pdf-btn').addEventListener('click', async () => {
+      const preview = document.getElementById('preview');
+      // Fix preview width for capture (approx A4 width at 96dpi)
+      const originalWidth = preview.style.width;
+      preview.style.width = '793.7px';
+
+      try {
+        const canvas = await html2canvas(preview, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: '#fff',
+          scrollY: -window.scrollY
+        });
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const margin = 20;
+        const imgWidth = pdfWidth - margin * 2;
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+
+        if(imgHeight < (pdfHeight - margin * 2)) {
+          pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
+        } else {
+          // Pagination for tall content
+          let heightLeft = canvas.height;
+          let position = margin;
+          let imgHeightPxPerPage = canvas.width * (pdfHeight - margin * 2) / imgWidth;
+          let srcY = 0;
+          const pageCanvas = document.createElement('canvas');
+          const pageCtx = pageCanvas.getContext('2d');
+          pageCanvas.width = canvas.width;
+          while (heightLeft > 0) {
+            let sliceHeight = Math.min(imgHeightPxPerPage, heightLeft);
+            pageCanvas.height = sliceHeight;
+            pageCtx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+            pageCtx.drawImage(canvas, 0, srcY, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
+            const pageData = pageCanvas.toDataURL('image/png');
+            if(srcY > 0) pdf.addPage();
+            pdf.addImage(pageData, 'PNG', margin, margin, imgWidth, pdfHeight - margin * 2);
+            heightLeft -= sliceHeight;
+            srcY += sliceHeight;
+          }
+        }
+        pdf.save('resume.pdf');
+      } catch(e) {
+        alert("Failed to generate PDF. Please try again.");
+        console.error(e);
+      } finally {
+        preview.style.width = originalWidth; // restore
+      }
+    });
+  });
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
